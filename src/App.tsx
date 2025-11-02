@@ -1,5 +1,20 @@
-function App() {
-  return <div class="text-amber-700">asdfas</div>;
-}
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import CityForecast from "./pages/CityForecast";
+import Favorite from "./pages/Favorite";
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <div className="w-full h-full text-white">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/city/:name" element={<CityForecast />} />
+          <Route path="/favorite" element={<Favorite />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
+};
 
 export default App;
