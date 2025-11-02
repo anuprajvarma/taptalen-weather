@@ -1,43 +1,60 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import CityCard from "../components/CityCard";
 import type { WeatherType } from "../type";
 import Header from "../components/ForecastHeader";
 
 const cities = ["Delhi", "Mumbai", "London", "New York"];
+const API_KEY = "68cd7a68db194487a3f75541250211";
+
+const fetchWeatherData = async (): Promise<WeatherType[]> => {
+  const citiesData = JSON.parse(localStorage.getItem("favorites") || "[]");
+  const allCities = citiesData.length > 0 ? citiesData : cities;
+
+  const promises = allCities.map((city: string) =>
+    fetch(
+      `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}`
+    ).then((res) => {
+      if (!res.ok) throw new Error(`Failed to fetch weather for ${city}`);
+      return res.json();
+    })
+  );
+
+  return Promise.all(promises);
+};
 
 const Dashboard = () => {
-  const [weatherData, setWeatherData] = useState<WeatherType[]>([]);
+  const {
+    data: weatherData,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<WeatherType[]>({
+    queryKey: ["weatherData"],
+    queryFn: fetchWeatherData,
+    refetchInterval: 60 * 1000,
+    refetchOnWindowFocus: true,
+  });
 
-  useEffect(() => {
-    async function fetchWeather() {
-      try {
-        const apiKey = "68cd7a68db194487a3f75541250211";
-        const citiesData = JSON.parse(
-          localStorage.getItem("favorites") || "[]"
-        );
-        const allCities = citiesData.length > 0 ? citiesData : cities;
-        const promises = allCities.map((city: string) =>
-          fetch(
-            `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`
-          ).then((res) => res.json())
-        );
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-screen text-slate-400">
+        Loading weather data...
+      </div>
+    );
 
-        const results = await Promise.all(promises);
-        setWeatherData(results);
-      } catch (error) {
-        console.error("Error fetching weather data:", error);
-      }
-    }
-
-    fetchWeather();
-  }, []);
+  if (isError)
+    return (
+      <div className="flex justify-center items-center h-screen text-red-400">
+        {(error as Error).message || "Error fetching weather data"}
+      </div>
+    );
 
   return (
     <div className="flex flex-col">
       <Header />
       <div className="flex justify-center w-full">
         <div className="flex flex-wrap gap-8 p-4 w-[80rem]">
-          {weatherData.map((city, i) => (
+          {weatherData?.map((city, i) => (
             <CityCard
               key={i}
               name={city.location.name}
