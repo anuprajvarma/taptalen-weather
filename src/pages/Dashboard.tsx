@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CityCard from "../components/CityCard";
-import DashboardHeader from "../components/DashboardHeader";
 import type { WeatherType } from "../type";
+import Header from "../components/ForecastHeader";
 
 const cities = ["Delhi", "Mumbai", "London", "New York"];
 
@@ -12,7 +12,11 @@ const Dashboard = () => {
     async function fetchWeather() {
       try {
         const apiKey = "68cd7a68db194487a3f75541250211";
-        const promises = cities.map((city) =>
+        const citiesData = JSON.parse(
+          localStorage.getItem("favorites") || "[]"
+        );
+        const allCities = citiesData.length > 0 ? citiesData : cities;
+        const promises = allCities.map((city: string) =>
           fetch(
             `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`
           ).then((res) => res.json())
@@ -30,7 +34,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col">
-      <DashboardHeader />
+      <Header />
       <div className="flex justify-center w-full">
         <div className="flex flex-wrap gap-8 p-4 w-[80rem]">
           {weatherData.map((city, i) => (

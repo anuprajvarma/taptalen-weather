@@ -9,7 +9,7 @@ const App = () => {
       <div className="w-full h-full text-white">
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/city/:name" element={<CityForecast />} />
+          <Route path="/city/:cityName" element={<CityForecast />} />
           <Route path="/favorite" element={<Favorite />} />
         </Routes>
       </div>

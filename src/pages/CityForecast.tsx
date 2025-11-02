@@ -3,9 +3,10 @@ import type { WeatherApiResponse } from "../type";
 import { getWeatherForecast } from "../apicall";
 import Header from "../components/ForecastHeader";
 import WeatherDetails from "../components/ForecastList";
+import { useParams } from "react-router-dom";
 
 const Dashboard = () => {
-  const [city, setCity] = useState("Delhi");
+  const { cityName } = useParams<{ cityName: string }>();
   const [data, setData] = useState<WeatherApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -17,12 +18,12 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetchWeather(city);
-  }, [city]);
+    fetchWeather(cityName ?? "Delhi");
+  }, [cityName]);
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-900 text-white">
-      <Header onSelectCity={setCity} currentCity={city} />
+      <Header />
       {loading ? (
         <p className="text-center mt-10">Loading...</p>
       ) : data ? (

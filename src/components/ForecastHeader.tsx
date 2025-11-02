@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Sun, Moon, Heart, Save } from "lucide-react";
 
 interface CitySuggestion {
@@ -9,13 +9,14 @@ interface CitySuggestion {
   lon: number;
 }
 
-interface HeaderProps {
-  onSelectCity: (city: string) => void;
-  currentCity: string;
-}
+// interface HeaderProps {
+//   onSelectCity: (city: string) => void;
+//   currentCity: string;
+// }
 
-const Header: React.FC<HeaderProps> = ({ onSelectCity, currentCity }) => {
+const Header = () => {
   const [query, setQuery] = useState("");
+  const { cityName } = useParams<{ cityName: string }>();
   const [suggestions, setSuggestions] = useState<CitySuggestion[]>([]);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
   const navigate = useNavigate();
@@ -36,16 +37,15 @@ const Header: React.FC<HeaderProps> = ({ onSelectCity, currentCity }) => {
   const handleSelect = (city: string) => {
     setQuery(city);
     setSuggestions([]);
-    onSelectCity(city);
+    navigate(`/city/${city}`);
   };
 
-  // Save to favorites in localStorage
   const handleSaveCity = () => {
     const existing = JSON.parse(localStorage.getItem("favorites") || "[]");
-    if (!existing.includes(currentCity)) {
-      const updated = [...existing, currentCity];
+    if (!existing.includes(cityName)) {
+      const updated = [...existing, cityName];
       localStorage.setItem("favorites", JSON.stringify(updated));
-      alert(`${currentCity} added to favorites ✅`);
+      alert(`${cityName} added to favorites ✅`);
     } else {
       alert("City already in favorites!");
     }
@@ -95,7 +95,7 @@ const Header: React.FC<HeaderProps> = ({ onSelectCity, currentCity }) => {
 
       {/* 🌍 Current City + Actions */}
       <div className="flex items-center gap-4">
-        <p className="font-semibold text-lg">{currentCity}</p>
+        <p className="font-semibold text-lg">{cityName}</p>
 
         <button
           onClick={handleSaveCity}
