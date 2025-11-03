@@ -103,7 +103,7 @@ const Header = () => {
         w-full px-4 py-3
         bg-white text-gray-900 shadow-md
         dark:bg-gray-900 dark:text-gray-100
-        transition-colors duration-300
+        transition-colors duration-300 sticky top-0 z-30
       "
     >
       {/* 🔍 Search */}
