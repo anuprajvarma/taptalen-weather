@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Sun, Moon, Heart, Save } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Sun, Moon } from "lucide-react";
+import { TbPinnedFilled, TbPinned } from "react-icons/tb";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 
 interface CitySuggestion {
   name: string;
@@ -9,26 +11,47 @@ interface CitySuggestion {
   lon: number;
 }
 
-// interface HeaderProps {
-//   onSelectCity: (city: string) => void;
-//   currentCity: string;
-// }
+export interface BookMarksType {
+  cityName: string;
+  isSave: boolean;
+  isPin: boolean;
+}
 
 const Header = () => {
   const [query, setQuery] = useState("");
+  const location = useLocation();
   const { cityName } = useParams<{ cityName: string }>();
   const [suggestions, setSuggestions] = useState<CitySuggestion[]>([]);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
+  const [BookMarks, setBookMarks] = useState<BookMarksType[]>(
+    JSON.parse(localStorage.getItem("BookMarks") || "[]")
+  );
   const navigate = useNavigate();
 
-  // Fetch autocomplete cities
+  const isCityPage = location.pathname.startsWith("/city/");
+
+  const isBookMark = cityName
+    ? BookMarks.filter((d) => d.cityName === cityName && d.isSave === true)
+        .length > 0
+      ? true
+      : false
+    : false;
+
+  const isPin = cityName
+    ? BookMarks.filter((d) => d.cityName === cityName && d.isPin === true)
+        .length > 0
+      ? true
+      : false
+    : false;
+
+  // 🔍 Fetch autocomplete cities
   const fetchCities = async (value: string) => {
     if (value.length < 2) {
       setSuggestions([]);
       return;
     }
     const res = await fetch(
-      `https://api.weatherapi.com/v1/search.json?key=68cd7a68db194487a3f75541250211&q=${value}`
+      `https://api.weatherapi.com/v1/search.json?key=2d3ba7e748b1454fbe525406250311&q=${value}`
     );
     const data = await res.json();
     setSuggestions(data);
@@ -40,18 +63,50 @@ const Header = () => {
     navigate(`/city/${city}`);
   };
 
-  const handleSaveCity = () => {
-    const existing = JSON.parse(localStorage.getItem("favorites") || "[]");
-    if (!existing.includes(cityName)) {
-      const updated = [...existing, cityName];
-      localStorage.setItem("favorites", JSON.stringify(updated));
-      alert(`${cityName} added to favorites ✅`);
+  const handleToggleBookMark = () => {
+    if (!cityName) return;
+
+    const existing = BookMarks.find((c) => c.cityName === cityName);
+
+    let updatedBookMarks;
+
+    if (existing) {
+      // If city already exists → toggle save (optional) or just ignore
+      updatedBookMarks = BookMarks.filter((d) => d.cityName !== cityName);
     } else {
-      alert("City already in favorites!");
+      // Add city as saved (not pinned)
+      updatedBookMarks = [
+        ...BookMarks,
+        { cityName, isSave: true, isPin: false },
+      ];
     }
+
+    setBookMarks(updatedBookMarks);
+    localStorage.setItem("BookMarks", JSON.stringify(updatedBookMarks));
   };
 
-  // Theme toggle
+  const handleTogglePinMark = () => {
+    if (!cityName) return;
+
+    const existing = BookMarks.find((c) => c.cityName === cityName);
+    let updatedBookMarks;
+
+    if (!existing) {
+      updatedBookMarks = [
+        ...BookMarks,
+        { cityName, isSave: false, isPin: true },
+      ];
+    } else {
+      updatedBookMarks = BookMarks.map((c) =>
+        c.cityName === cityName ? { ...c, isSave: false, isPin: !c.isPin } : c
+      );
+    }
+
+    setBookMarks(updatedBookMarks);
+    localStorage.setItem("BookMarks", JSON.stringify(updatedBookMarks));
+  };
+
+  // 🌙 Theme toggle
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
@@ -93,26 +148,38 @@ const Header = () => {
         )}
       </div>
 
-      {/* 🌍 Current City + Actions */}
+      {/* 🌍 City Info & Actions */}
       <div className="flex items-center gap-4">
-        <p className="font-semibold text-lg">{cityName}</p>
+        {isCityPage && (
+          <div className="flex items-center gap-4">
+            <p className="font-semibold text-lg">{cityName}</p>
 
-        <button
-          onClick={handleSaveCity}
-          className="p-2 bg-blue-600 hover:bg-blue-500 rounded-lg"
-          title="Save to Favorites"
-        >
-          <Save size={18} />
-        </button>
+            <button
+              onClick={handleToggleBookMark}
+              className="p-2 rounded-lg hover:bg-slate-700 transition"
+              title={isBookMark ? "Remove from BookMarks" : "Add to BookMarks"}
+            >
+              {isBookMark ? (
+                <FaBookmark className="text-slate-400" size={22} />
+              ) : (
+                <FaRegBookmark size={22} />
+              )}
+            </button>
+            <button
+              onClick={handleTogglePinMark}
+              className="p-2 rounded-lg hover:bg-slate-700 transition"
+              title={isBookMark ? "Remove from pinnmark" : "Add to pinnmark"}
+            >
+              {isPin ? (
+                <TbPinnedFilled className="text-slate-400" size={22} />
+              ) : (
+                <TbPinned size={22} />
+              )}
+            </button>
+          </div>
+        )}
 
-        <button
-          onClick={() => navigate("/favorites")}
-          className="p-2 bg-pink-600 hover:bg-pink-500 rounded-lg"
-          title="Go to Favorites"
-        >
-          <Heart size={18} />
-        </button>
-
+        {/* 🌙 Theme Toggle */}
         <button
           onClick={toggleTheme}
           className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg"

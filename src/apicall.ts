@@ -1,6 +1,6 @@
 import type { WeatherApiResponse } from "./type";
 
-const API_KEY = "68cd7a68db194487a3f75541250211"; // or process.env.NEXT_PUBLIC_WEATHER_API_KEY
+const API_KEY = "2d3ba7e748b1454fbe525406250311"; // or process.env.NEXT_PUBLIC_WEATHER_API_KEY
 const BASE_URL = "https://api.weatherapi.com/v1";
 
 export const getWeatherForecast = async (
