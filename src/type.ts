@@ -23,9 +23,12 @@ export interface ForecastDay {
   date: string;
   day: {
     avgtemp_c: number;
+    avgtemp_f: number;
     maxtemp_c: number;
     mintemp_c: number;
     condition: WeatherCondition;
+    totalprecip_mm: number;
+    maxwind_kph: number;
   };
   hour: Hour[];
 }

@@ -121,7 +121,22 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
         </ResponsiveContainer>
       </div>
 
-      <WeatherCharts hourlyData={hourlyData} />
+      <WeatherCharts
+        hourlyData={selectedDay.hour.map((h) => ({
+          time: h.time.split(" ")[1],
+          temp: unit === "C" ? h.temp_c : h.temp_f,
+          precip_mm: h.precip_mm,
+          wind_kph: h.wind_kph,
+          wind_dir: h.wind_dir,
+        }))}
+        dailyData={forecast.forecastday.map((d) => ({
+          date: d.date,
+          avgtemp_c: d.day.avgtemp_c,
+          avgtemp_f: d.day.avgtemp_f,
+          totalprecip_mm: d.day.totalprecip_mm,
+          maxwind_kph: d.day.maxwind_kph,
+        }))}
+      />
 
       {/* 📊 Detail Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -18,28 +19,75 @@ interface ChartProps {
     temp: number;
     precip_mm: number;
     wind_kph: number;
-    wind_dir: string;
+  }[];
+  dailyData: {
+    date: string;
+    avgtemp_c: number;
+    avgtemp_f: number;
+    totalprecip_mm: number;
+    maxwind_kph: number;
   }[];
 }
 
-const WeatherCharts = ({ hourlyData }: ChartProps) => {
+const WeatherCharts = ({ hourlyData, dailyData }: ChartProps) => {
   const { unit } = useTempUnit();
+  const [view, setView] = useState<"hourly" | "daily">("hourly");
+
+  const chartData =
+    view === "hourly"
+      ? hourlyData.map((h) => ({
+          time: h.time,
+          temp: h.temp,
+          precip_mm: h.precip_mm,
+          wind_kph: h.wind_kph,
+        }))
+      : dailyData.map((d) => ({
+          time: d.date.split("-").slice(1).join("/"), // MM/DD
+          temp: unit === "C" ? d.avgtemp_c : d.avgtemp_f,
+          precip_mm: d.totalprecip_mm,
+          wind_kph: d.maxwind_kph,
+        }));
 
   return (
     <div className="space-y-10 py-6">
+      {/* 🔁 Toggle Buttons */}
+      <div className="flex justify-center gap-4 mb-6">
+        <button
+          onClick={() => setView("hourly")}
+          className={`px-4 py-2 rounded-lg font-medium transition ${
+            view === "hourly"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 dark:bg-gray-700 dark:text-gray-300"
+          }`}
+        >
+          Hourly
+        </button>
+        <button
+          onClick={() => setView("daily")}
+          className={`px-4 py-2 rounded-lg font-medium transition ${
+            view === "daily"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 dark:bg-gray-700 dark:text-gray-300"
+          }`}
+        >
+          Daily
+        </button>
+      </div>
+
       {/* 🌡️ Temperature Trend */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4">
         <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
-          Temperature Trend ({unit === "C" ? "°C" : "°F"})
+          Temperature Trend ({unit === "C" ? "°C" : "°F"}) —{" "}
+          {view === "hourly" ? "Hourly" : "Daily"}
         </h3>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={hourlyData}>
+          <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
             <XAxis dataKey="time" stroke="#9ca3af" />
             <YAxis stroke="#9ca3af" />
             <Tooltip
               contentStyle={{
-                backgroundColor: "var(--tw-prose-body, #1f2937)",
+                backgroundColor: "#1f2937",
                 color: "white",
               }}
             />
@@ -59,21 +107,15 @@ const WeatherCharts = ({ hourlyData }: ChartProps) => {
         <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
           Precipitation (mm)
         </h3>
-        {hourlyData?.length ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={hourlyData}>
-              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
-              <XAxis dataKey="time" stroke="#d1d5db" />
-              <YAxis stroke="#d1d5db" />
-              <Tooltip />
-              <Bar dataKey="precip_mm" fill="#60a5fa" />
-            </BarChart>
-          </ResponsiveContainer>
-        ) : (
-          <p className="text-gray-400 text-center">
-            No precipitation data available
-          </p>
-        )}
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
+            <XAxis dataKey="time" stroke="#d1d5db" />
+            <YAxis stroke="#d1d5db" />
+            <Tooltip />
+            <Bar dataKey="precip_mm" fill="#60a5fa" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       {/* 🌬️ Wind Speed */}
@@ -82,7 +124,7 @@ const WeatherCharts = ({ hourlyData }: ChartProps) => {
           Wind Speed (km/h)
         </h3>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={hourlyData}>
+          <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
             <XAxis dataKey="time" stroke="#9ca3af" />
             <YAxis stroke="#9ca3af" />
