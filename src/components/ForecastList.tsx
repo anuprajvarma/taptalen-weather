@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import type { CurrentWeather, Forecast } from "../type";
 import { useTempUnit } from "../hooks/useTempUnit";
+import WeatherCharts from "./WeatherCharts";
 
 interface WeatherDetailsProps {
   cityName: string;
@@ -33,6 +34,9 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
   const hourlyData = selectedDay.hour.map((h) => ({
     time: h.time.split(" ")[1],
     temp: unit === "C" ? h.temp_c : h.temp_f,
+    precip_mm: h.precip_mm,
+    wind_kph: h.wind_kph,
+    wind_dir: h.wind_dir,
   }));
 
   return (
@@ -116,6 +120,8 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
           </LineChart>
         </ResponsiveContainer>
       </div>
+
+      <WeatherCharts hourlyData={hourlyData} />
 
       {/* 📊 Detail Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">

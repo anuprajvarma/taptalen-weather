@@ -14,6 +14,9 @@ export interface Hour {
   time: string;
   temp_c: number;
   temp_f: number;
+  precip_mm: number;
+  wind_kph: number;
+  wind_dir: string;
 }
 
 export interface ForecastDay {
