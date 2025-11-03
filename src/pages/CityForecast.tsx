@@ -41,7 +41,6 @@ const Dashboard = () => {
     >
       {/* 🌤 Header */}
       <Header />
-
       {/* 📄 Content */}
       <main
         className="
@@ -74,19 +73,6 @@ const Dashboard = () => {
           </p>
         )}
       </main>
-
-      {/* 📌 Footer (optional aesthetic touch) */}
-      <footer className="text-center text-sm py-4 text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
-        Weather data powered by{" "}
-        <a
-          href="https://www.weatherapi.com/"
-          className="text-blue-600 dark:text-blue-400 hover:underline"
-          target="_blank"
-          rel="noreferrer"
-        >
-          WeatherAPI
-        </a>
-      </footer>
     </div>
   );
 };

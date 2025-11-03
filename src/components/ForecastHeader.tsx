@@ -5,6 +5,9 @@ import { TbPinnedFilled, TbPinned } from "react-icons/tb";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { useTempUnit } from "../hooks/useTempUnit";
 
+const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 interface CitySuggestion {
   name: string;
   country: string;
@@ -44,7 +47,7 @@ const Header = () => {
   const fetchCities = async (value: string) => {
     if (value.length < 2) return setSuggestions([]);
     const res = await fetch(
-      `https://api.weatherapi.com/v1/search.json?key=2d3ba7e748b1454fbe525406250311&q=${value}`
+      `${BASE_URL}/search.json?key=${API_KEY}&q=${value}`
     );
     const data = await res.json();
     setSuggestions(data);
@@ -102,7 +105,7 @@ const Header = () => {
         flex flex-wrap items-center justify-between gap-3
         w-full px-4 py-3
         bg-white text-gray-900 shadow-md
-        dark:bg-gray-900 dark:text-gray-100
+        dark:bg-gray-800 dark:text-gray-100
         transition-colors duration-300 sticky top-0 z-30
       "
     >
@@ -119,7 +122,7 @@ const Header = () => {
           className="
             w-full px-4 py-2 rounded-lg border border-gray-300
             dark:border-gray-700
-            bg-gray-50 dark:bg-gray-800
+            bg-gray-50 dark:bg-gray-900
             text-gray-800 dark:text-gray-100
             placeholder:text-gray-500
             focus:outline-none focus:ring-2 focus:ring-blue-500

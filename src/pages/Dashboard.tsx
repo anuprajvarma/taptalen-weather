@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import CityCard from "../components/CityCard";
 import type { WeatherType } from "../type";
 import Header, { type BookMarksType } from "../components/ForecastHeader";
+import Footer from "../components/Footer";
 
 const cities = [
   { cityName: "Delhi", isSave: false, isPin: false },
@@ -9,7 +10,8 @@ const cities = [
   { cityName: "New York", isSave: false, isPin: false },
   { cityName: "London", isSave: false, isPin: false },
 ];
-const API_KEY = "2d3ba7e748b1454fbe525406250311";
+const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const fetchWeatherData = async (): Promise<WeatherType[]> => {
   const BookMarksData = JSON.parse(localStorage.getItem("BookMarks") || "[]");
@@ -21,13 +23,13 @@ const fetchWeatherData = async (): Promise<WeatherType[]> => {
   const allCities = citiesData.length > 0 ? citiesData : cities;
 
   const promises = allCities.map((data: BookMarksType) =>
-    fetch(
-      `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${data.cityName}`
-    ).then((res) => {
-      if (!res.ok)
-        throw new Error(`Failed to fetch weather for ${data.cityName}`);
-      return res.json();
-    })
+    fetch(`${BASE_URL}/current.json?key=${API_KEY}&q=${data.cityName}`).then(
+      (res) => {
+        if (!res.ok)
+          throw new Error(`Failed to fetch weather for ${data.cityName}`);
+        return res.json();
+      }
+    )
   );
 
   return Promise.all(promises);
@@ -97,18 +99,7 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* 🌙 Footer */}
-      <footer className="text-center text-sm py-4 text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
-        Weather data powered by{" "}
-        <a
-          href="https://www.weatherapi.com/"
-          className="text-blue-600 dark:text-blue-400 hover:underline"
-          target="_blank"
-          rel="noreferrer"
-        >
-          WeatherAPI
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 };

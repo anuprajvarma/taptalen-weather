@@ -1,7 +1,7 @@
 import type { WeatherApiResponse } from "./type";
 
-const API_KEY = "2d3ba7e748b1454fbe525406250311"; // or process.env.NEXT_PUBLIC_WEATHER_API_KEY
-const BASE_URL = "https://api.weatherapi.com/v1";
+const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const getWeatherForecast = async (
   city: string
