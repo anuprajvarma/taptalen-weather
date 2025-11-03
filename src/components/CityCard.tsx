@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTempUnit } from "../hooks/useTempUnit";
 
 interface CityCardProps {
   name: string;
@@ -17,6 +18,8 @@ const CityCard = ({
   wind,
   humidity,
 }: CityCardProps) => {
+  const { unit } = useTempUnit();
+  const displayTemp = unit === "C" ? temp : (temp * 9) / 5 + 32;
   return (
     <Link
       to={`/city/${name}`}
@@ -32,7 +35,9 @@ const CityCard = ({
     >
       {/* 🌡 Left Section */}
       <div className="flex flex-col items-center sm:items-start gap-2 text-center sm:text-left">
-        <p className="text-4xl sm:text-3xl font-semibold">{temp}°C</p>
+        <p className="text-4xl sm:text-3xl font-semibold">
+          {displayTemp.toFixed(1)}°{unit}
+        </p>
         <p className="text-xl sm:text-lg font-medium truncate">{name}</p>
         <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">
           {condition}

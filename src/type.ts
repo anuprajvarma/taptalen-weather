@@ -13,6 +13,7 @@ export interface WeatherCondition {
 export interface Hour {
   time: string;
   temp_c: number;
+  temp_f: number;
 }
 
 export interface ForecastDay {

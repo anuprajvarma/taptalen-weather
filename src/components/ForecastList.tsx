@@ -9,6 +9,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import type { CurrentWeather, Forecast } from "../type";
+import { useTempUnit } from "../hooks/useTempUnit";
 
 interface WeatherDetailsProps {
   cityName: string;
@@ -22,6 +23,7 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
   current,
 }) => {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const { unit } = useTempUnit();
 
   useEffect(() => {
     setSelectedDayIndex(0);
@@ -30,7 +32,7 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
   const selectedDay = forecast.forecastday[selectedDayIndex];
   const hourlyData = selectedDay.hour.map((h) => ({
     time: h.time.split(" ")[1],
-    temp: h.temp_c,
+    temp: unit === "C" ? h.temp_c : h.temp_f,
   }));
 
   return (
@@ -62,7 +64,12 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
                 alt={day.day.condition.text}
                 className="w-10 h-10 sm:w-12 sm:h-12 my-2"
               />
-              <p className="font-semibold">{day.day.avgtemp_c}°C</p>
+              <p className="font-semibold">
+                {unit === "C"
+                  ? day.day.avgtemp_c
+                  : (day.day.avgtemp_c * 9) / 5 + 32}
+                °{unit}
+              </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[6rem]">
                 {day.day.condition.text}
               </p>
@@ -113,8 +120,22 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
       {/* 📊 Detail Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
         {[
-          { label: "Max Temp", value: `${selectedDay.day.maxtemp_c}°C` },
-          { label: "Min Temp", value: `${selectedDay.day.mintemp_c}°C` },
+          {
+            label: "Max Temp",
+            value: `${
+              unit === "C"
+                ? selectedDay.day.maxtemp_c
+                : (selectedDay.day.maxtemp_c * 9) / 5 + 32
+            }°${unit}`,
+          },
+          {
+            label: "Min Temp",
+            value: `${
+              unit === "C"
+                ? selectedDay.day.mintemp_c
+                : (selectedDay.day.mintemp_c * 9) / 5 + 32
+            }°${unit}`,
+          },
           { label: "Condition", value: selectedDay.day.condition.text },
           { label: "Humidity", value: `${current.humidity}%` },
         ].map((info) => (

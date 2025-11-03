@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 import { TbPinnedFilled, TbPinned } from "react-icons/tb";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
+import { useTempUnit } from "../hooks/useTempUnit";
 
 interface CitySuggestion {
   name: string;
@@ -20,6 +21,7 @@ export interface BookMarksType {
 const Header = () => {
   const [query, setQuery] = useState("");
   const location = useLocation();
+  const { unit, toggleUnit } = useTempUnit();
   const { cityName } = useParams<{ cityName: string }>();
   const [suggestions, setSuggestions] = useState<CitySuggestion[]>([]);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
@@ -180,6 +182,18 @@ const Header = () => {
             </button>
           </div>
         )}
+
+        <button
+          onClick={toggleUnit}
+          className="
+          px-4 py-2 rounded-full cursor-pointer
+          bg-blue-600 dark:bg-blue-500 text-white
+          hover:bg-blue-700 dark:hover:bg-blue-600
+          transition
+        "
+        >
+          {unit === "C" ? "°C" : "°F"}
+        </button>
 
         {/* 🌙 Theme Toggle */}
         <button
