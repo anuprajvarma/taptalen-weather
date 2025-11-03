@@ -31,25 +31,16 @@ const Header = () => {
   const isCityPage = location.pathname.startsWith("/city/");
 
   const isBookMark = cityName
-    ? BookMarks.filter((d) => d.cityName === cityName && d.isSave === true)
-        .length > 0
-      ? true
-      : false
+    ? BookMarks.some((d) => d.cityName === cityName && d.isSave)
     : false;
 
   const isPin = cityName
-    ? BookMarks.filter((d) => d.cityName === cityName && d.isPin === true)
-        .length > 0
-      ? true
-      : false
+    ? BookMarks.some((d) => d.cityName === cityName && d.isPin)
     : false;
 
-  // 🔍 Fetch autocomplete cities
+  // 🔍 Fetch autocomplete suggestions
   const fetchCities = async (value: string) => {
-    if (value.length < 2) {
-      setSuggestions([]);
-      return;
-    }
+    if (value.length < 2) return setSuggestions([]);
     const res = await fetch(
       `https://api.weatherapi.com/v1/search.json?key=2d3ba7e748b1454fbe525406250311&q=${value}`
     );
@@ -63,66 +54,58 @@ const Header = () => {
     navigate(`/city/${city}`);
   };
 
+  // 📍 Bookmark toggle
   const handleToggleBookMark = () => {
     if (!cityName) return;
 
-    const existing = BookMarks.find((c) => c.cityName === cityName);
+    const exists = BookMarks.find((c) => c.cityName === cityName);
+    const updated = exists
+      ? BookMarks.filter((d) => d.cityName !== cityName)
+      : [...BookMarks, { cityName, isSave: true, isPin: false }];
 
-    let updatedBookMarks;
-
-    if (existing) {
-      // If city already exists → toggle save (optional) or just ignore
-      updatedBookMarks = BookMarks.filter((d) => d.cityName !== cityName);
-    } else {
-      // Add city as saved (not pinned)
-      updatedBookMarks = [
-        ...BookMarks,
-        { cityName, isSave: true, isPin: false },
-      ];
-    }
-
-    setBookMarks(updatedBookMarks);
-    localStorage.setItem("BookMarks", JSON.stringify(updatedBookMarks));
+    setBookMarks(updated);
+    localStorage.setItem("BookMarks", JSON.stringify(updated));
   };
 
+  // 📌 Pin toggle
   const handleTogglePinMark = () => {
     if (!cityName) return;
 
-    const existing = BookMarks.find((c) => c.cityName === cityName);
-    let updatedBookMarks;
+    const exists = BookMarks.find((c) => c.cityName === cityName);
+    const updated = exists
+      ? BookMarks.map((c) =>
+          c.cityName === cityName ? { ...c, isPin: !c.isPin } : c
+        )
+      : [...BookMarks, { cityName, isSave: false, isPin: true }];
 
-    if (!existing) {
-      updatedBookMarks = [
-        ...BookMarks,
-        { cityName, isSave: false, isPin: true },
-      ];
-    } else {
-      updatedBookMarks = BookMarks.map((c) =>
-        c.cityName === cityName ? { ...c, isSave: false, isPin: !c.isPin } : c
-      );
-    }
-
-    setBookMarks(updatedBookMarks);
-    localStorage.setItem("BookMarks", JSON.stringify(updatedBookMarks));
+    setBookMarks(updated);
+    localStorage.setItem("BookMarks", JSON.stringify(updated));
   };
 
-  // 🌙 Theme toggle
+  // 🌓 Theme toggle
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
     localStorage.setItem("theme", newTheme);
   };
 
-  // Apply theme on load
+  // Apply theme to <html>
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
 
   return (
-    <header className="flex items-center justify-between bg-slate-900 dark:bg-slate-800 text-white p-4 shadow-md">
-      {/* 🔍 Search Bar */}
-      <div className="relative w-[20rem]">
+    <header
+      className="
+        flex flex-wrap items-center justify-between gap-3
+        w-full px-4 py-3
+        bg-white text-gray-900 shadow-md
+        dark:bg-gray-900 dark:text-gray-100
+        transition-colors duration-300
+      "
+    >
+      {/* 🔍 Search */}
+      <div className="relative w-full sm:w-[22rem]">
         <input
           type="text"
           placeholder="Search city..."
@@ -131,15 +114,33 @@ const Header = () => {
             setQuery(e.target.value);
             fetchCities(e.target.value);
           }}
-          className="w-full px-4 py-2 rounded-lg text-slate-200 outline-none border border-slate-700"
+          className="
+            w-full px-4 py-2 rounded-lg border border-gray-300
+            dark:border-gray-700
+            bg-gray-50 dark:bg-gray-800
+            text-gray-800 dark:text-gray-100
+            placeholder:text-gray-500
+            focus:outline-none focus:ring-2 focus:ring-blue-500
+            transition
+          "
         />
         {suggestions.length > 0 && (
-          <ul className="absolute w-full bg-slate-800 text-slate-200 border border-slate-700 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto z-20">
+          <ul
+            className="
+              absolute w-full mt-1 rounded-lg shadow-lg z-20
+              bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700
+              max-h-60 overflow-y-auto
+            "
+          >
             {suggestions.map((city, i) => (
               <li
                 key={i}
                 onClick={() => handleSelect(city.name)}
-                className="p-2 hover:bg-slate-700 cursor-pointer"
+                className="
+                  px-4 py-2 cursor-pointer
+                  hover:bg-gray-100 dark:hover:bg-gray-700
+                  transition
+                "
               >
                 {city.name}, {city.country}
               </li>
@@ -148,32 +149,33 @@ const Header = () => {
         )}
       </div>
 
-      {/* 🌍 City Info & Actions */}
-      <div className="flex items-center gap-4">
+      {/* 🧭 City + Actions */}
+      <div className="flex items-center gap-3 ml-auto">
         {isCityPage && (
-          <div className="flex items-center gap-4">
-            <p className="font-semibold text-lg">{cityName}</p>
+          <div className="flex items-center gap-2">
+            <p className="font-semibold text-base sm:text-lg">{cityName}</p>
 
             <button
               onClick={handleToggleBookMark}
-              className="p-2 rounded-lg hover:bg-slate-700 transition"
-              title={isBookMark ? "Remove from BookMarks" : "Add to BookMarks"}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              title={isBookMark ? "Remove from bookmarks" : "Add to bookmarks"}
             >
               {isBookMark ? (
-                <FaBookmark className="text-slate-400" size={22} />
+                <FaBookmark className="text-yellow-500" size={20} />
               ) : (
-                <FaRegBookmark size={22} />
+                <FaRegBookmark size={20} />
               )}
             </button>
+
             <button
               onClick={handleTogglePinMark}
-              className="p-2 rounded-lg hover:bg-slate-700 transition"
-              title={isBookMark ? "Remove from pinnmark" : "Add to pinnmark"}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              title={isPin ? "Unpin" : "Pin city"}
             >
               {isPin ? (
-                <TbPinnedFilled className="text-slate-400" size={22} />
+                <TbPinnedFilled className="text-blue-500" size={20} />
               ) : (
-                <TbPinned size={22} />
+                <TbPinned size={20} />
               )}
             </button>
           </div>
@@ -182,8 +184,13 @@ const Header = () => {
         {/* 🌙 Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg"
-          title="Toggle Theme"
+          className="
+            p-2 rounded-lg border border-gray-300 dark:border-gray-700
+            bg-gray-100 dark:bg-gray-800
+            hover:bg-gray-200 dark:hover:bg-gray-700
+            transition
+          "
+          title="Toggle theme"
         >
           {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
         </button>

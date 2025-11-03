@@ -9,12 +9,20 @@ const Dashboard = () => {
   const { cityName } = useParams<{ cityName: string }>();
   const [data, setData] = useState<WeatherApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchWeather = async (cityName: string) => {
-    setLoading(true);
-    const res = await getWeatherForecast(cityName);
-    setData(res);
-    setLoading(false);
+  const fetchWeather = async (city: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await getWeatherForecast(city);
+      setData(res);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch weather data. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -22,19 +30,63 @@ const Dashboard = () => {
   }, [cityName]);
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 text-white">
+    <div
+      className="
+        min-h-screen 
+        bg-gray-100 dark:bg-gray-900 
+        text-gray-900 dark:text-gray-100
+        transition-colors duration-300
+        flex flex-col
+      "
+    >
+      {/* 🌤 Header */}
       <Header />
-      {loading ? (
-        <p className="text-center mt-10">Loading...</p>
-      ) : data ? (
-        <WeatherDetails
-          cityName={data.location.name}
-          forecast={data.forecast}
-          current={data.current}
-        />
-      ) : (
-        <p className="text-center mt-10 text-red-400">No data available</p>
-      )}
+
+      {/* 📄 Content */}
+      <main
+        className="
+          flex-grow 
+          w-full max-w-6xl mx-auto 
+          px-4 sm:px-6 md:px-8 
+          py-6 sm:py-10
+        "
+      >
+        {loading ? (
+          <div className="flex flex-col items-center justify-center h-64 text-center">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-lg font-medium text-gray-600 dark:text-gray-400">
+              Fetching weather data...
+            </p>
+          </div>
+        ) : error ? (
+          <p className="text-center text-red-500 text-lg font-medium mt-10">
+            {error}
+          </p>
+        ) : data ? (
+          <WeatherDetails
+            cityName={data.location.name}
+            forecast={data.forecast}
+            current={data.current}
+          />
+        ) : (
+          <p className="text-center text-red-400 mt-10 text-lg">
+            No weather data available.
+          </p>
+        )}
+      </main>
+
+      {/* 📌 Footer (optional aesthetic touch) */}
+      <footer className="text-center text-sm py-4 text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
+        Weather data powered by{" "}
+        <a
+          href="https://www.weatherapi.com/"
+          className="text-blue-600 dark:text-blue-400 hover:underline"
+          target="_blank"
+          rel="noreferrer"
+        >
+          WeatherAPI
+        </a>
+      </footer>
     </div>
   );
 };

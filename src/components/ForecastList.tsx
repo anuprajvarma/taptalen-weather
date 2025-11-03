@@ -23,7 +23,6 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
 }) => {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
 
-  // Select current day by default
   useEffect(() => {
     setSelectedDayIndex(0);
   }, [forecast]);
@@ -35,52 +34,77 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
   }));
 
   return (
-    <div className="p-6 space-y-8">
-      <h2 className="text-2xl font-bold text-center">{cityName} Forecast</h2>
+    <div className="p-4 sm:p-6 md:p-8 space-y-8 text-gray-800 dark:text-gray-100 transition-colors duration-300">
+      {/* 🏙 City Title */}
+      <h2 className="text-2xl md:text-3xl font-bold text-center capitalize">
+        {cityName} Forecast
+      </h2>
 
       {/* 🌤️ 7-Day Forecast Selector */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4">
         {forecast.forecastday.map((day, i) => {
           const isActive = i === selectedDayIndex;
           return (
             <button
               key={day.date}
               onClick={() => setSelectedDayIndex(i)}
-              className={`p-4 rounded-xl flex flex-col items-center transition duration-300 ${
+              className={`p-4 rounded-xl flex flex-col items-center transition-all duration-300 text-sm sm:text-base ${
                 isActive
-                  ? "bg-blue-600 scale-105 shadow-lg"
-                  : "bg-slate-800 hover:bg-slate-700"
+                  ? "bg-blue-500 text-white scale-105 shadow-lg"
+                  : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
             >
-              <p className="text-sm">{day.date}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
+                {day.date}
+              </p>
               <img
                 src={day.day.condition.icon}
                 alt={day.day.condition.text}
-                className="w-12 h-12"
+                className="w-10 h-10 sm:w-12 sm:h-12 my-2"
               />
               <p className="font-semibold">{day.day.avgtemp_c}°C</p>
-              <p className="text-xs">{day.day.condition.text}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[6rem]">
+                {day.day.condition.text}
+              </p>
             </button>
           );
         })}
       </div>
 
       {/* 📈 Hourly Temperature Graph */}
-      <div className="bg-slate-800 p-6 rounded-xl">
-        <h3 className="text-lg font-semibold mb-4">
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm transition-colors">
+        <h3 className="text-lg sm:text-xl font-semibold mb-4">
           Hourly Temperature — {selectedDay.date}
         </h3>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={hourlyData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="time" />
-            <YAxis />
-            <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+            <XAxis
+              dataKey="time"
+              stroke="currentColor"
+              style={{ fontSize: "0.8rem" }}
+            />
+            <YAxis
+              stroke="currentColor"
+              style={{ fontSize: "0.8rem" }}
+              width={35}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1f2937",
+                borderRadius: "0.5rem",
+                border: "none",
+                color: "#fff",
+              }}
+              labelStyle={{ color: "#9ca3af" }}
+            />
             <Line
               type="monotone"
               dataKey="temp"
               stroke="#3b82f6"
               strokeWidth={2}
+              dot={{ r: 3 }}
+              activeDot={{ r: 5 }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -88,22 +112,22 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
 
       {/* 📊 Detail Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-        <div className="bg-slate-800 p-4 rounded-xl">
-          <p className="text-sm text-gray-400">Max Temp</p>
-          <p className="text-xl font-bold">{selectedDay.day.maxtemp_c}°C</p>
-        </div>
-        <div className="bg-slate-800 p-4 rounded-xl">
-          <p className="text-sm text-gray-400">Min Temp</p>
-          <p className="text-xl font-bold">{selectedDay.day.mintemp_c}°C</p>
-        </div>
-        <div className="bg-slate-800 p-4 rounded-xl">
-          <p className="text-sm text-gray-400">Condition</p>
-          <p className="text-xl font-bold">{selectedDay.day.condition.text}</p>
-        </div>
-        <div className="bg-slate-800 p-4 rounded-xl">
-          <p className="text-sm text-gray-400">Humidity</p>
-          <p className="text-xl font-bold">{current.humidity}%</p>
-        </div>
+        {[
+          { label: "Max Temp", value: `${selectedDay.day.maxtemp_c}°C` },
+          { label: "Min Temp", value: `${selectedDay.day.mintemp_c}°C` },
+          { label: "Condition", value: selectedDay.day.condition.text },
+          { label: "Humidity", value: `${current.humidity}%` },
+        ].map((info) => (
+          <div
+            key={info.label}
+            className="bg-gray-100 dark:bg-gray-800 p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
+          >
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {info.label}
+            </p>
+            <p className="text-lg sm:text-xl font-bold">{info.value}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
