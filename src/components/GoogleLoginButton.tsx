@@ -3,19 +3,13 @@ import { googleLogout, useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { userState } from "../redux/slices/UserLoginSlice";
-
-interface GoogleUser {
-  name: string;
-  email: string;
-  picture: string;
-}
+import type { GoogleUser } from "../type";
 
 const GoogleLoginButton = () => {
   const [user, setUser] = useState<GoogleUser | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const dispatch = useDispatch();
 
-  // 🔹 Load user from localStorage when app starts
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -23,7 +17,6 @@ const GoogleLoginButton = () => {
     }
   }, []);
 
-  // 🔹 Save user to localStorage whenever it changes
   useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
@@ -34,7 +27,7 @@ const GoogleLoginButton = () => {
       localStorage.setItem("isLogin", JSON.stringify(false));
       dispatch(userState());
     }
-  }, [user]);
+  }, [user, dispatch]);
 
   const handleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -70,7 +63,6 @@ const GoogleLoginButton = () => {
         </button>
       ) : (
         <div className="relative">
-          {/* Profile Row */}
           <button
             onClick={() => setMenuOpen((prev) => !prev)}
             className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -100,7 +92,6 @@ const GoogleLoginButton = () => {
             </svg>
           </button>
 
-          {/* Logout Dropdown */}
           {menuOpen && (
             <div className="absolute right-0 w-20 md:w-40 bg-white dark:bg-gray-900 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700 z-10">
               <button

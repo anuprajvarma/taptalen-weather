@@ -12,7 +12,6 @@ const userLoginSlice = createSlice({
     userState: (state) => {
       console.log(state.isLogin);
       state.isLogin = state.isLogin === true ? false : true;
-      //   localStorage.setItem("isLogin", JSON.stringify(state.isLogin));
     },
   },
 });

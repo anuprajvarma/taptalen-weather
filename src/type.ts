@@ -82,6 +82,12 @@ export interface GoogleUser {
   picture: string;
 }
 
+export interface GoogleUser {
+  name: string;
+  email: string;
+  picture: string;
+}
+
 export interface UserState {
   isLogin: boolean;
 }
