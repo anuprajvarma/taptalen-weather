@@ -1,8 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-export interface TemperatureState {
-  unit: "C" | "F";
-}
+import type { TemperatureState } from "../../type";
 
 const initialState: TemperatureState = {
   unit: (localStorage.getItem("tempUnit") as "C" | "F") || "C",

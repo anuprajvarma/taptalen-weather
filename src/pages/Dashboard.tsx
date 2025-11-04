@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import CityCard from "../components/CityCard";
-import type { WeatherType } from "../type";
-import Header, { type BookMarksType } from "../components/ForecastHeader";
+import type { BookMarksType, WeatherType } from "../type";
+import Header from "../components/ForecastHeader";
 import Footer from "../components/Footer";
 
 const cities = [

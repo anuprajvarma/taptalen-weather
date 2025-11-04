@@ -71,3 +71,51 @@ export type WeatherType = {
     humidity: number;
   };
 };
+
+export interface TemperatureState {
+  unit: "C" | "F";
+}
+
+export interface CityCardProps {
+  name: string;
+  temp: number;
+  condition: string;
+  icon: string;
+  wind: number;
+  humidity: number;
+}
+
+export interface CitySuggestion {
+  name: string;
+  country: string;
+  lat: number;
+  lon: number;
+}
+
+export interface BookMarksType {
+  cityName: string;
+  isSave: boolean;
+  isPin: boolean;
+}
+
+export interface ChartProps {
+  hourlyData: {
+    time: string;
+    temp: number;
+    precip_mm: number;
+    wind_kph: number;
+  }[];
+  dailyData: {
+    date: string;
+    avgtemp_c: number;
+    avgtemp_f: number;
+    totalprecip_mm: number;
+    maxwind_kph: number;
+  }[];
+}
+
+export interface WeatherDetailsProps {
+  cityName: string;
+  forecast: Forecast;
+  current: CurrentWeather;
+}

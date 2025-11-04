@@ -13,22 +13,7 @@ import {
   Legend,
 } from "recharts";
 import type { RootState } from "../redux/Store";
-
-interface ChartProps {
-  hourlyData: {
-    time: string;
-    temp: number;
-    precip_mm: number;
-    wind_kph: number;
-  }[];
-  dailyData: {
-    date: string;
-    avgtemp_c: number;
-    avgtemp_f: number;
-    totalprecip_mm: number;
-    maxwind_kph: number;
-  }[];
-}
+import type { ChartProps } from "../type";
 
 const WeatherCharts = ({ hourlyData, dailyData }: ChartProps) => {
   const [view, setView] = useState<"hourly" | "daily">("hourly");

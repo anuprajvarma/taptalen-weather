@@ -8,16 +8,10 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import type { CurrentWeather, Forecast } from "../type";
 import WeatherCharts from "./WeatherCharts";
 import { useSelector } from "react-redux";
 import type { RootState } from "../redux/Store";
-
-interface WeatherDetailsProps {
-  cityName: string;
-  forecast: Forecast;
-  current: CurrentWeather;
-}
+import type { WeatherDetailsProps } from "../type";
 
 const WeatherDetails: React.FC<WeatherDetailsProps> = ({
   cityName,

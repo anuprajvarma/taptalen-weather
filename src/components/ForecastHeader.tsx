@@ -6,22 +6,10 @@ import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../redux/Store";
 import { toggleUnit } from "../redux/slices/TempFormSlice";
+import type { BookMarksType, CitySuggestion } from "../type";
 
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-
-interface CitySuggestion {
-  name: string;
-  country: string;
-  lat: number;
-  lon: number;
-}
-
-export interface BookMarksType {
-  cityName: string;
-  isSave: boolean;
-  isPin: boolean;
-}
 
 const Header = () => {
   const [query, setQuery] = useState("");

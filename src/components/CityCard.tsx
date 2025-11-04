@@ -1,15 +1,7 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import type { RootState } from "../redux/Store";
-
-interface CityCardProps {
-  name: string;
-  temp: number;
-  condition: string;
-  icon: string;
-  wind: number;
-  humidity: number;
-}
+import type { CityCardProps } from "../type";
 
 const CityCard = ({
   name,

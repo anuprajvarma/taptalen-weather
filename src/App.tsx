@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
-import CityForecast from "./pages/CityForecast";
+import { CityForecast } from "./pages/CityForecast";
 
 const App = () => {
   return (
