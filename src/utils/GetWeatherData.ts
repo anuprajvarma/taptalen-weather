@@ -8,7 +8,7 @@ const FetchWeatherData = async (): Promise<WeatherType[]> => {
     (d: BookMarksType) => d.isSave === true
   );
   const pinmark = BookMarksData.filter((d: BookMarksType) => d.isPin === true);
-  const citiesData = [...pinmark, ...savemark];
+  const citiesData = [...pinmark.slice().reverse(), ...savemark];
   const allCities =
     citiesData.length > 0 ? (loginStatus ? citiesData : cities) : cities;
 
