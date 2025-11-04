@@ -1,5 +1,6 @@
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useTempUnit } from "../hooks/useTempUnit";
+import type { RootState } from "../redux/Store";
 
 interface CityCardProps {
   name: string;
@@ -18,7 +19,7 @@ const CityCard = ({
   wind,
   humidity,
 }: CityCardProps) => {
-  const { unit } = useTempUnit();
+  const unit = useSelector((state: RootState) => state.temp.unit);
   const displayTemp = unit === "C" ? temp : (temp * 9) / 5 + 32;
   return (
     <Link
@@ -33,7 +34,6 @@ const CityCard = ({
         transition-all duration-300 ease-in-out
       "
     >
-      {/* 🌡 Left Section */}
       <div className="flex flex-col items-center sm:items-start gap-2 text-center sm:text-left">
         <p className="text-4xl sm:text-3xl font-semibold">
           {displayTemp.toFixed(1)}°{unit}
@@ -44,7 +44,6 @@ const CityCard = ({
         </p>
       </div>
 
-      {/* 🌤 Right Section */}
       <div className="flex flex-col items-center sm:items-end">
         <img
           src={icon}

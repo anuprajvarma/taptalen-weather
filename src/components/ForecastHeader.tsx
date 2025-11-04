@@ -3,7 +3,9 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 import { TbPinnedFilled, TbPinned } from "react-icons/tb";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
-import { useTempUnit } from "../hooks/useTempUnit";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "../redux/Store";
+import { toggleUnit } from "../redux/slices/TempFormSlice";
 
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -24,7 +26,8 @@ export interface BookMarksType {
 const Header = () => {
   const [query, setQuery] = useState("");
   const location = useLocation();
-  const { unit, toggleUnit } = useTempUnit();
+  const dispatch = useDispatch();
+  const unit = useSelector((state: RootState) => state.temp.unit);
   const { cityName } = useParams<{ cityName: string }>();
   const [suggestions, setSuggestions] = useState<CitySuggestion[]>([]);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
@@ -43,7 +46,6 @@ const Header = () => {
     ? BookMarks.some((d) => d.cityName === cityName && d.isPin)
     : false;
 
-  // 🔍 Fetch autocomplete suggestions
   const fetchCities = async (value: string) => {
     if (value.length < 2) return setSuggestions([]);
     const res = await fetch(
@@ -59,7 +61,6 @@ const Header = () => {
     navigate(`/city/${city}`);
   };
 
-  // 📍 Bookmark toggle
   const handleToggleBookMark = () => {
     if (!cityName) return;
 
@@ -72,7 +73,6 @@ const Header = () => {
     localStorage.setItem("BookMarks", JSON.stringify(updated));
   };
 
-  // 📌 Pin toggle
   const handleTogglePinMark = () => {
     if (!cityName) return;
 
@@ -87,14 +87,12 @@ const Header = () => {
     localStorage.setItem("BookMarks", JSON.stringify(updated));
   };
 
-  // 🌓 Theme toggle
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
   };
 
-  // Apply theme to <html>
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
@@ -109,7 +107,6 @@ const Header = () => {
         transition-colors duration-300 sticky top-0 z-30
       "
     >
-      {/* 🔍 Search */}
       <div className="relative w-full sm:w-[22rem]">
         <input
           type="text"
@@ -154,7 +151,6 @@ const Header = () => {
         )}
       </div>
 
-      {/* 🧭 City + Actions */}
       <div className="flex items-center gap-3 ml-auto">
         {isCityPage && (
           <div className="flex items-center gap-2">
@@ -187,7 +183,7 @@ const Header = () => {
         )}
 
         <button
-          onClick={toggleUnit}
+          onClick={() => dispatch(toggleUnit())}
           className="
           px-4 py-2 rounded-full cursor-pointer
           bg-blue-600 dark:bg-blue-500 text-white
@@ -198,7 +194,6 @@ const Header = () => {
           {unit === "C" ? "°C" : "°F"}
         </button>
 
-        {/* 🌙 Theme Toggle */}
         <button
           onClick={toggleTheme}
           className="

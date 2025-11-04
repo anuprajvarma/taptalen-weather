@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import {
   LineChart,
   Line,
@@ -11,7 +12,7 @@ import {
   Bar,
   Legend,
 } from "recharts";
-import { useTempUnit } from "../hooks/useTempUnit";
+import type { RootState } from "../redux/Store";
 
 interface ChartProps {
   hourlyData: {
@@ -30,8 +31,8 @@ interface ChartProps {
 }
 
 const WeatherCharts = ({ hourlyData, dailyData }: ChartProps) => {
-  const { unit } = useTempUnit();
   const [view, setView] = useState<"hourly" | "daily">("hourly");
+  const unit = useSelector((state: RootState) => state.temp.unit);
 
   const chartData =
     view === "hourly"
@@ -42,7 +43,7 @@ const WeatherCharts = ({ hourlyData, dailyData }: ChartProps) => {
           wind_kph: h.wind_kph,
         }))
       : dailyData.map((d) => ({
-          time: d.date.split("-").slice(1).join("/"), // MM/DD
+          time: d.date.split("-").slice(1).join("/"),
           temp: unit === "C" ? d.avgtemp_c : d.avgtemp_f,
           precip_mm: d.totalprecip_mm,
           wind_kph: d.maxwind_kph,
@@ -50,7 +51,6 @@ const WeatherCharts = ({ hourlyData, dailyData }: ChartProps) => {
 
   return (
     <div className="space-y-10 py-6">
-      {/* 🔁 Toggle Buttons */}
       <div className="flex justify-center gap-4 mb-6">
         <button
           onClick={() => setView("hourly")}
@@ -73,8 +73,6 @@ const WeatherCharts = ({ hourlyData, dailyData }: ChartProps) => {
           Daily
         </button>
       </div>
-
-      {/* 🌡️ Temperature Trend */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4">
         <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
           Temperature Trend ({unit === "C" ? "°C" : "°F"}) —{" "}
@@ -101,8 +99,6 @@ const WeatherCharts = ({ hourlyData, dailyData }: ChartProps) => {
           </LineChart>
         </ResponsiveContainer>
       </div>
-
-      {/* ☔ Precipitation */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 min-h-[350px]">
         <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
           Precipitation (mm)
@@ -117,8 +113,6 @@ const WeatherCharts = ({ hourlyData, dailyData }: ChartProps) => {
           </BarChart>
         </ResponsiveContainer>
       </div>
-
-      {/* 🌬️ Wind Speed */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4">
         <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
           Wind Speed (km/h)

@@ -75,10 +75,7 @@ const Dashboard = () => {
         transition-colors duration-300
       "
     >
-      {/* 🌤 Header */}
       <Header />
-
-      {/* 🌍 Weather Cards Section */}
       <div
         className="
           flex flex-wrap justify-center gap-6 sm:gap-8

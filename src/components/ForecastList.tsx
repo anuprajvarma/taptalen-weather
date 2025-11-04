@@ -9,8 +9,9 @@ import {
   CartesianGrid,
 } from "recharts";
 import type { CurrentWeather, Forecast } from "../type";
-import { useTempUnit } from "../hooks/useTempUnit";
 import WeatherCharts from "./WeatherCharts";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/Store";
 
 interface WeatherDetailsProps {
   cityName: string;
@@ -24,7 +25,7 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
   current,
 }) => {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
-  const { unit } = useTempUnit();
+  const unit = useSelector((state: RootState) => state.temp.unit);
 
   useEffect(() => {
     setSelectedDayIndex(0);
@@ -41,12 +42,9 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
 
   return (
     <div className="p-4 sm:p-6 md:p-8 space-y-8 text-gray-800 dark:text-gray-100 transition-colors duration-300">
-      {/* 🏙 City Title */}
       <h2 className="text-2xl md:text-3xl font-bold text-center capitalize">
         {cityName} Forecast
       </h2>
-
-      {/* 🌤️ 7-Day Forecast Selector */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4">
         {forecast.forecastday.map((day, i) => {
           const isActive = i === selectedDayIndex;
@@ -81,8 +79,6 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
           );
         })}
       </div>
-
-      {/* 📈 Hourly Temperature Graph */}
       <div className="bg-gray-100 dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm transition-colors">
         <h3 className="text-lg sm:text-xl font-semibold mb-4">
           Hourly Temperature — {selectedDay.date}
@@ -137,8 +133,6 @@ const WeatherDetails: React.FC<WeatherDetailsProps> = ({
           maxwind_kph: d.day.maxwind_kph,
         }))}
       />
-
-      {/* 📊 Detail Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
         {[
           {

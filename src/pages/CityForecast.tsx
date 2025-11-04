@@ -39,9 +39,7 @@ const Dashboard = () => {
         flex flex-col
       "
     >
-      {/* 🌤 Header */}
       <Header />
-      {/* 📄 Content */}
       <main
         className="
           flex-grow 
