@@ -76,6 +76,16 @@ export interface TemperatureState {
   unit: "C" | "F";
 }
 
+export interface GoogleUser {
+  name: string;
+  email: string;
+  picture: string;
+}
+
+export interface UserState {
+  isLogin: boolean;
+}
+
 export interface CityCardProps {
   name: string;
   temp: number;

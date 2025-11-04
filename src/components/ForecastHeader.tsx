@@ -24,6 +24,7 @@ const Header = () => {
     JSON.parse(localStorage.getItem("BookMarks") || "[]")
   );
   const navigate = useNavigate();
+  const [showPopup, setShowPopup] = useState(false);
 
   const isCityPage = location.pathname.startsWith("/city/");
 
@@ -35,6 +36,7 @@ const Header = () => {
     ? BookMarks.some((d) => d.cityName === cityName && d.isPin)
     : false;
 
+  // 🧠 Fetch city suggestions
   const fetchCities = async (value: string) => {
     if (value.length < 2) return setSuggestions([]);
     const res = await fetch(
@@ -44,44 +46,64 @@ const Header = () => {
     setSuggestions(data);
   };
 
+  // 🧠 Select city from suggestions
   const handleSelect = (city: string) => {
     setQuery(city);
     setSuggestions([]);
     navigate(`/city/${city}`);
   };
 
+  // 🧠 Check login before protected actions
+  const handleProtectedAction = (callback: () => void) => {
+    const loginStatus = JSON.parse(localStorage.getItem("isLogin") || "{}");
+
+    if (!loginStatus) {
+      setShowPopup(true);
+      return;
+    }
+    callback();
+  };
+
+  // 🧠 Toggle Bookmark
   const handleToggleBookMark = () => {
-    if (!cityName) return;
+    handleProtectedAction(() => {
+      if (!cityName) return;
 
-    const exists = BookMarks.find((c) => c.cityName === cityName);
-    const updated = exists
-      ? BookMarks.filter((d) => d.cityName !== cityName)
-      : [...BookMarks, { cityName, isSave: true, isPin: false }];
+      const exists = BookMarks.find((c) => c.cityName === cityName);
+      const updated = exists
+        ? BookMarks.filter((d) => d.cityName !== cityName)
+        : [...BookMarks, { cityName, isSave: true, isPin: false }];
 
-    setBookMarks(updated);
-    localStorage.setItem("BookMarks", JSON.stringify(updated));
+      setBookMarks(updated);
+      localStorage.setItem("BookMarks", JSON.stringify(updated));
+    });
   };
 
+  // 🧠 Toggle Pin
   const handleTogglePinMark = () => {
-    if (!cityName) return;
+    handleProtectedAction(() => {
+      if (!cityName) return;
 
-    const exists = BookMarks.find((c) => c.cityName === cityName);
-    const updated = exists
-      ? BookMarks.map((c) =>
-          c.cityName === cityName ? { ...c, isPin: !c.isPin } : c
-        )
-      : [...BookMarks, { cityName, isSave: false, isPin: true }];
+      const exists = BookMarks.find((c) => c.cityName === cityName);
+      const updated = exists
+        ? BookMarks.map((c) =>
+            c.cityName === cityName ? { ...c, isPin: !c.isPin } : c
+          )
+        : [...BookMarks, { cityName, isSave: false, isPin: true }];
 
-    setBookMarks(updated);
-    localStorage.setItem("BookMarks", JSON.stringify(updated));
+      setBookMarks(updated);
+      localStorage.setItem("BookMarks", JSON.stringify(updated));
+    });
   };
 
+  // 🌙 Toggle Theme
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
   };
 
+  // 💾 Persist theme + check login
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
@@ -96,6 +118,7 @@ const Header = () => {
         transition-colors duration-300 sticky top-0 z-30
       "
     >
+      {/* Search Input */}
       <div className="relative w-full sm:w-[22rem]">
         <input
           type="text"
@@ -140,6 +163,7 @@ const Header = () => {
         )}
       </div>
 
+      {/* Right Controls */}
       <div className="flex items-center gap-3 ml-auto">
         {isCityPage && (
           <div className="flex items-center gap-2">
@@ -171,18 +195,20 @@ const Header = () => {
           </div>
         )}
 
+        {/* Temperature Unit */}
         <button
           onClick={() => dispatch(toggleUnit())}
           className="
-          px-4 py-2 rounded-full cursor-pointer
-          bg-blue-600 dark:bg-blue-500 text-white
-          hover:bg-blue-700 dark:hover:bg-blue-600
-          transition
-        "
+            px-4 py-2 rounded-full cursor-pointer
+            bg-blue-600 dark:bg-blue-500 text-white
+            hover:bg-blue-700 dark:hover:bg-blue-600
+            transition
+          "
         >
           {unit === "C" ? "°C" : "°F"}
         </button>
 
+        {/* Theme Button */}
         <button
           onClick={toggleTheme}
           className="
@@ -195,8 +221,28 @@ const Header = () => {
         >
           {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
         </button>
+
+        {/* Google Login */}
         <GoogleLoginButton />
       </div>
+
+      {/* Login Required Popup */}
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl text-center w-[90%] sm:w-[25rem]">
+            <p className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
+              You need to log in to save or pin cities
+            </p>
+            <GoogleLoginButton />
+            <button
+              onClick={() => setShowPopup(false)}
+              className="mt-4 px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded-md hover:bg-gray-400 dark:hover:bg-gray-600 transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

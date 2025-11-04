@@ -3,12 +3,14 @@ import type { BookMarksType, WeatherType } from "../type";
 
 const FetchWeatherData = async (): Promise<WeatherType[]> => {
   const BookMarksData = JSON.parse(localStorage.getItem("BookMarks") || "[]");
+  const loginStatus = JSON.parse(localStorage.getItem("isLogin") || "false");
   const savemark = BookMarksData.filter(
     (d: BookMarksType) => d.isSave === true
   );
   const pinmark = BookMarksData.filter((d: BookMarksType) => d.isPin === true);
   const citiesData = [...pinmark, ...savemark];
-  const allCities = citiesData.length > 0 ? citiesData : cities;
+  const allCities =
+    citiesData.length > 0 ? (loginStatus ? citiesData : cities) : cities;
 
   const promises = allCities.map((data: BookMarksType) =>
     fetch(`${BASE_URL}/current.json?key=${API_KEY}&q=${data.cityName}`).then(

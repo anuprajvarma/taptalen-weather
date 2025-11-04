@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { googleLogout, useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { userState } from "../redux/slices/UserLoginSlice";
 
 interface GoogleUser {
   name: string;
@@ -11,6 +13,7 @@ interface GoogleUser {
 const GoogleLoginButton = () => {
   const [user, setUser] = useState<GoogleUser | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const dispatch = useDispatch();
 
   // 🔹 Load user from localStorage when app starts
   useEffect(() => {
@@ -24,10 +27,12 @@ const GoogleLoginButton = () => {
   useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
+      dispatch(userState());
       localStorage.setItem("isLogin", JSON.stringify(true));
     } else {
       localStorage.removeItem("user");
       localStorage.setItem("isLogin", JSON.stringify(false));
+      dispatch(userState());
     }
   }, [user]);
 
