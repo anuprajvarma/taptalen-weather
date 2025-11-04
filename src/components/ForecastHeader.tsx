@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../redux/Store";
 import { toggleUnit } from "../redux/slices/TempFormSlice";
 import type { BookMarksType, CitySuggestion } from "../type";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -194,6 +195,7 @@ const Header = () => {
         >
           {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
         </button>
+        <GoogleLoginButton />
       </div>
     </header>
   );
