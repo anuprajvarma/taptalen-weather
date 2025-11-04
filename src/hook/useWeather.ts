@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import type { WeatherApiResponse } from "../type";
-import { getWeatherForecast } from "../apicall";
+import { getWeatherForecast } from "../utils/apicall";
 
 export const UseWeather = (city: string) => {
   return useQuery<WeatherApiResponse>({

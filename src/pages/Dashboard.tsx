@@ -1,52 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
 import CityCard from "../components/CityCard";
-import type { BookMarksType, WeatherType } from "../type";
 import Header from "../components/ForecastHeader";
 import Footer from "../components/Footer";
-
-const cities = [
-  { cityName: "Delhi", isSave: false, isPin: false },
-  { cityName: "Mumbai", isSave: false, isPin: false },
-  { cityName: "New York", isSave: false, isPin: false },
-  { cityName: "London", isSave: false, isPin: false },
-];
-const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-
-const fetchWeatherData = async (): Promise<WeatherType[]> => {
-  const BookMarksData = JSON.parse(localStorage.getItem("BookMarks") || "[]");
-  const savemark = BookMarksData.filter(
-    (d: BookMarksType) => d.isSave === true
-  );
-  const pinmark = BookMarksData.filter((d: BookMarksType) => d.isPin === true);
-  const citiesData = [...pinmark, ...savemark];
-  const allCities = citiesData.length > 0 ? citiesData : cities;
-
-  const promises = allCities.map((data: BookMarksType) =>
-    fetch(`${BASE_URL}/current.json?key=${API_KEY}&q=${data.cityName}`).then(
-      (res) => {
-        if (!res.ok)
-          throw new Error(`Failed to fetch weather for ${data.cityName}`);
-        return res.json();
-      }
-    )
-  );
-
-  return Promise.all(promises);
-};
+import { UseWeatherData } from "../hook/UseWeatherData";
 
 const Dashboard = () => {
-  const {
-    data: weatherData,
-    isLoading,
-    isError,
-    error,
-  } = useQuery<WeatherType[]>({
-    queryKey: ["weatherData"],
-    queryFn: fetchWeatherData,
-    refetchInterval: 60 * 1000,
-    refetchOnWindowFocus: true,
-  });
+  const { data: weatherData, isLoading, isError, error } = UseWeatherData();
 
   if (isLoading)
     return (
